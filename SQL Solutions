@@ -99,3 +99,10 @@ ON m.mov_id=a.mov_id
 4) SELECT movie.*
 FROM movie
 WHERE mov_title='I love BDM'
+
+
+# Write your MySQL query statement below
+SELECT E2.name AS Employee FROM EMPLOYEE AS E1
+JOIN EMPLOYEE AS E2
+ON E1.id = E2.managerId
+WHERE E2.salary > E1.salary
