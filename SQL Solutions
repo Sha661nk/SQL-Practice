@@ -1,0 +1,101 @@
+#11
+
+a)
+SELECT e.id, CASE
+WHEN e.id='POL' THEN 1
+WHEN e.id='GRE' THEN 2
+WHEN e.id='CZE' THEN 3
+ELSE 0 
+END AS 'country'
+FROM eteam (AS) e
+
+b)
+SELECT player,CONCAT(stadium,',',coach) AS 'HappyHolidays',gtime FROM goal 
+JOIN game ON game.id=goal.matchid
+JOIN eteam ON goal.teamid=eteam.id
+WHERE gtime<20
+
+c)
+SELECT matchid, mdate, COUNT(gtime)
+FROM game JOIN goal ON game.id=matchid
+WHERE team1='ITA' OR team2='ITA'
+GROUP BY matchid,mdate
+
+#12
+
+1)
+SELECT firs_name,last_name FROM employees JOIN jobs ON jobs.job_id=employees.job_id
+WHERE max_salary<3*min_salary
+
+2)
+SELECT  m.employee_id, e.first_name,e.last_name
+FROM employees e JOIN employees m ON e.manager_id=m.employee_id
+
+3)
+SELECT UPPER(city), 
+CASE WHEN city='New York' THEN 0.01
+WHEN city='Newark' THEN 0.02
+ELSE 0.00 
+END AS 'tax_rate'
+FROM location
+
+4)
+SELECT * FROM employees WHERE salary >
+(SELECT salary FROM employees WHERE employee_id=200)
+
+5)
+SELECT employee_id, first_name, last_name
+FROM employees JOIN departments ON employees.department_id=departments.department_id
+WHERE EXTRACT(YEAR FROM hire_date) = 1987
+ORDER BY CASE WHEN  deparment_name='IT' THEN 0 ELSE 1 END
+
+6)
+SELECT employee_id, first_name, last_name
+FROM employees
+JOIN departments ON employees.department_id=departments.department_id
+JOIN locations ON locations.location_id=dapratments.location_id
+JOIN countires.country_id=locations.country_id
+WHERE salary BETWEEN (3000,12345) AND country_name LIKE '%U%' OR country_name LIKE '% %'
+
+7)
+SELECT e.first_name,e.last_name
+FROM employee e JOIN employee m ON e.manager_id=m.employee_id
+WHERE e.commission_pct > m.commission_pct
+
+#13
+1) SELECT mov_title, mov_year, dir_fname,dir_lname FROM movie
+JOIN movie_cast ON moive_cast.mov_id=movie.mov_id
+JOIN actor ON actor.act_id=movie_cast.act_id
+JOIN movie_direction ON movie_direction.mov_id=movie.mov_id
+JOIN director ON director.dir_id=movie_dirction.dir_id
+WHERE movie_cast.role='Rick Deckard' AND mov_id IN (SELECT mov_id FROM movie_cast JOIN actor ON movie_cast.act_id=actor.act_id WHERE act_fname ='Harrison' AND act_lname='Ford')
+	
+2) SELECT mov_title
+FROM movie JOIN rating ON movie.mov_id=rating.mov_id
+WHERE 
+GROUP BY mov_title
+HAVING COUNT(rev_id)>2 AND AVG(rev_star)>3.5
+ORDER BY mov_title DESC
+
+3) SELECT CONCAT(a.act_fname,'',a.act_lname), CONCAT(d.dir_fname,'',d.dir_lname) 
+FROM
+(SELECT movie.* FROM movie 
+JOIN movie_cast ON movie.mov_id=movie_cast.mov_id
+JOIN actor ON actor.act_id=movie_cast.act_id
+WHERE actor_fname='Harrison' AND actor_lname='Ford'
+) AS m
+JOIN
+(SELECT director.*, movie_direction.mov_id 
+FROM director JOIN movie_direction ON director.dir_id=movie_direction.dir_id
+) AS d
+ON m.mov_id=d.mov_id
+JOIN
+(SELECT actor.*, movie_cast.mov_id
+FROM movie_cast JOIN actor ON movie_cast.act_id=actor.act_id
+WHERE CONCAT(act_fname,' ',act_lname)!='Harrison Ford'
+)AS a
+ON m.mov_id=a.mov_id
+	
+4) SELECT movie.*
+FROM movie
+WHERE mov_title='I love BDM'
